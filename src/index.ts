@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 // PARAM token
 const token = process.env.DISCORD_TOKEN;
+
 console.log(token);
 
 const client = new MyClient({ intents: ['Guilds', 'GuildMessages', 'MessageContent'] });
@@ -34,7 +35,6 @@ client.on('messageCreate', async (interaction) => {
 		interaction.channel.send('에옹?');
 		return;
 	}
-
 	interaction.reply('야옹');
 });
 
