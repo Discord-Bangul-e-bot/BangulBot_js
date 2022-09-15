@@ -1,2 +1,6 @@
 # BangulBot_js
 [Side Project] discord 방울이 봇 프로젝트
+# 실행방법
+```
+npm run dev
+```
