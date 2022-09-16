@@ -4,6 +4,7 @@ services:
   discord:
     build: .
     container_name: ${CONTAINER_NAME}
+    working_dir: /usr/src/app
     user: root
     entrypoint: sh command.sh
     volumes:
