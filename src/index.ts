@@ -1,6 +1,6 @@
 // const Discord = require('discord.js');
 import Discord from 'discord.js';
-import MyClient from './bot/index.js';
+import MyClient from './bot/index';
 import dotenv from 'dotenv';
 dotenv.config();
 // PARAM token
@@ -46,3 +46,4 @@ client.on('message', (message) => {
 client.login(token);
 
 // export default client;
+export default client

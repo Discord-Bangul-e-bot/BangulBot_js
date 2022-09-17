@@ -3,7 +3,6 @@
 	"version": "0.0.1",
 	"description": "방울이 디스코드 봇",
 	"main": "index.ts",
-	"type": "module",
 	"engines": {
 		"node": ">= 16.13 <17"
 	},
@@ -25,7 +24,7 @@
 	},
 	"scripts": {
 		"dev": "tsc-watch --onSuccess \"nodemon build/src/index.js\"",
-		"start": "node build/src/main.js",
+		"start": "node build/src/index.js",
 		"clean": "rimraf coverage build tmp",
 		"prebuild": "npm run lint",
 		"build": "tsc -p tsconfig.json",
@@ -37,10 +36,14 @@
 		"test:watch": "jest --watch"
 	},
 	"dependencies": {
+		"commonjs": "^0.0.1",
 		"discord.js": "^14.3.0",
 		"dotenv": "^16.0.2",
+		"mysql2": "^2.3.3",
+		"reflect-metadata": "^0.1.13",
 		"tsc-watch": "^5.0.3",
-		"tslib": "~2.4"
+		"tslib": "~2.4",
+		"typeorm": "^0.3.9"
 	},
 	"volta": {
 		"node": "16.13.0"
