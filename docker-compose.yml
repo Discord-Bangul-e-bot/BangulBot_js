@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  discord:
+    build: .
+    container_name: ${CONTAINER_NAME}
+    working_dir: /usr/src/app
+    user: root
+    entrypoint: sh command.sh
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    environment:
+      TZ: 'Asia/Seoul'
