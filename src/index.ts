@@ -2,9 +2,20 @@
 import Discord from 'discord.js';
 import MyClient from './bot/index';
 import dotenv from 'dotenv';
+import { AppDataSource } from './backend/data-source';
+import User from './backend/entity/User';
+import Message from './backend/entity/Message';
 dotenv.config();
 // PARAM token
 const token = process.env.DISCORD_TOKEN;
+
+AppDataSource.initialize()
+	.then(() => {
+		console.log('Database Connected!');
+	})
+	.catch(() => {
+		console.log('Database Connect Failed!');
+	});
 
 console.log(token);
 
@@ -28,6 +39,8 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 client.on('messageCreate', async (interaction) => {
 	// NOTE: PREFIX를 커스텀으로 설정 할 수 있음
 	const command = client.getCommandFromMessage(interaction);
+	const user = await User.createOrGetFromInteraction(interaction);
+	Message.createFromInteraction(interaction);
 
 	if (!command.acceptable) return;
 
@@ -46,4 +59,4 @@ client.on('message', (message) => {
 client.login(token);
 
 // export default client;
-export default client
+export default client;
