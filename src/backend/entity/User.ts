@@ -1,8 +1,8 @@
 import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
-import BaseModel from './BaseModel';
+import BaseModel from 'src/backend/entity/BaseModel';
 import Discord from 'discord.js';
-import Message from './Message';
-import Relation from './Relation';
+import Message from 'src/backend/entity/Message';
+import Relation from 'src/backend/entity/Relation';
 
 @Entity()
 class User extends BaseModel {

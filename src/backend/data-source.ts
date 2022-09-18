@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import Cat from './entity/Cat';
-import Channel from './entity/Channel';
-import Message from './entity/Message';
-import Relation from './entity/Relation';
-import User from './entity/User';
+import Cat from 'src/backend/entity/Cat';
+import Channel from 'src/backend/entity/Channel';
+import Message from 'src/backend/entity/Message';
+import Relation from 'src/backend/entity/Relation';
+import User from 'src/backend/entity/User';
 
 export const AppDataSource = new DataSource({
 	type: 'mysql',
@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
 	port: 3306,
 	username: 'discordjs',
 	password: 'discordjs',
-	database: 'discordjs',
+	database: 'discordjstest',
 	synchronize: true,
 	logging: false,
 	entities: [Cat, Channel, User, Relation, Message],

@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import BaseModel from './BaseModel';
-import Relation from './Relation';
+import BaseModel from 'src/backend/entity/BaseModel';
+import Relation from 'src/backend/entity/Relation';
 
 @Entity()
 class Cat extends BaseModel {

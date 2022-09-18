@@ -1,5 +1,5 @@
 import { Column, Entity } from 'typeorm';
-import BaseModel from './BaseModel';
+import BaseModel from 'src/backend/entity/BaseModel';
 
 @Entity()
 class Channel extends BaseModel {

@@ -9,9 +9,9 @@ import {
 	OneToOne,
 	ManyToOne,
 } from 'typeorm';
-import BaseModel from './BaseModel';
-import Cat from './Cat';
-import User from './User';
+import BaseModel from 'src/backend/entity/BaseModel';
+import Cat from 'src/backend/entity/Cat';
+import User from 'src/backend/entity/User';
 
 @Entity()
 class Relation extends BaseModel {
