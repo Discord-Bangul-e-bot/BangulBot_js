@@ -1,4 +1,6 @@
 {
+	"clientId": "1019636232797573291",
+	"guildId": "1018278826314313791",
 	"compilerOptions": {
 		"target": "es6",
 		"module": "Node16",

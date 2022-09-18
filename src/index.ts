@@ -25,8 +25,18 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 	console.log('interaction Create');
 	if (!interaction.isChatInputCommand()) return;
 
-	if (interaction.commandName === 'stats') {
-		await interaction.reply(`Server count: ${client.guilds.cache.size}.`);
+	switch(interaction.commandName){
+		case 'stats':
+			await interaction.reply(`Server count: ${client.guilds.cache.size}.`);
+			break;
+		case 'meow':
+			await interaction.reply(`으애애애애애옹`);
+			break;
+		case '김한얼':
+			await interaction.reply('바보');
+			break;
+		default:
+			break;
 	}
 });
 
