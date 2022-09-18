@@ -24,6 +24,7 @@
 	},
 	"scripts": {
 		"dev": "tsc-watch --onSuccess \"nodemon --exec ts-node -r tsconfig-paths/register build/src/index.js\"",
+		"deploy":"tsc -p tsconfig.json  && node build/src/deploy-commands.js",
 		"start": "node build/src/index.js",
 		"clean": "rimraf coverage build tmp",
 		"prebuild": "npm run lint",
@@ -36,10 +37,13 @@
 		"test:watch": "jest --watch"
 	},
 	"dependencies": {
+		"@discordjs/rest": "^1.1.0",
 		"commonjs": "^0.0.1",
 		"discord.js": "^14.3.0",
 		"dotenv": "^16.0.2",
+		"global": "^4.4.0",
 		"mysql2": "^2.3.3",
+		"nodemon": "^2.0.20",
 		"reflect-metadata": "^0.1.13",
 		"tsc-watch": "^5.0.3",
 		"tsconfig-paths": "^4.1.0",
