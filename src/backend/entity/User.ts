@@ -1,8 +1,8 @@
-import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
-import BaseModel from 'src/backend/entity/BaseModel';
 import Discord from 'discord.js';
+import BaseModel from 'src/backend/entity/BaseModel';
 import Message from 'src/backend/entity/Message';
 import Relation from 'src/backend/entity/Relation';
+import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
 class User extends BaseModel {
@@ -20,25 +20,28 @@ class User extends BaseModel {
 		this.coin = 0;
 	}
 
-	static createOrGetFromInteraction(interaction: Discord.Message) {
+	static getOrCreate(arg: { id: number; name: string }) {
 		return new Promise<User>((resolve, reject) => {
-			const author = interaction.author;
-			const id = parseInt(author.id, 10);
-			const name = author.username;
-			User.findOneByOrFail({ id })
-				.then(async (user) => {
-					console.log('get exist User!');
-					user.name = name;
-					await user.save();
+			User.findOneByOrFail({ id: arg.id })
+				.then((user) => {
+					console.log('getUserFroMDB!');
 					resolve(user);
 				})
 				.catch(async () => {
-					const instance = User.create({ id, name });
+					console.log('createUser!!');
+					const instance = User.create<User>(arg);
 					const savedInstance = await instance.save();
-					console.log('create new User!');
 					resolve(savedInstance);
-				})
-				.catch(() => reject());
+				});
+		});
+	}
+
+	static getOrCreateFromMessage(message: Discord.Message) {
+		return new Promise<User>((resolve, reject) => {
+			const author = message.author;
+			const id = parseInt(author.id, 10);
+			const name = author.username;
+			User.getOrCreate({ id, name }).then(resolve).catch(reject);
 		});
 	}
 
