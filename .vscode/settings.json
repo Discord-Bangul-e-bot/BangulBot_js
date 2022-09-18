@@ -7,4 +7,5 @@
             "isWholeLine": false,
         },
     ],
+	"javascript.implicitProjectConfig.experimentalDecorators": true,
 }
