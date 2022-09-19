@@ -3,6 +3,8 @@ import BaseModel from 'src/backend/entity/BaseModel';
 import Cat from 'src/backend/entity/Cat';
 import User from 'src/backend/entity/User';
 import { AfterInsert, BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import CatRepository from 'src/backend/repository/CatRepository';
+import UserRepository from 'src/backend/repository/UserRepository';
 
 @Entity()
 class Relation extends BaseModel {
@@ -66,8 +68,8 @@ class Relation extends BaseModel {
 	}
 	static getRelationFromMessage(message: Discord.Message) {
 		return new Promise(async (resolve, reject) => {
-			const user = await User.getOrCreateFromMessage(message);
-			const cat = await Cat.getOrCreateFromMessage(message);
+			const user = await UserRepository.getOrCreateFromMessage(message);
+			const cat = await CatRepository.getOrCreateFromMessage(message);
 			Relation.getRelation({ user, cat }).then(resolve).catch(reject);
 		});
 	}
