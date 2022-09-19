@@ -5,6 +5,7 @@ import Message from 'src/backend/entity/Message';
 import Relation from 'src/backend/entity/Relation';
 import User from 'src/backend/entity/User';
 import CatRepository from 'src/backend/repository/CatRepository';
+import UserRepository from 'src/backend/repository/UserRepository';
 import { MessageBase } from 'src/backend/types';
 import { CHURRPRICE } from 'src/const';
 
@@ -68,7 +69,7 @@ class InteractionRepository {
 		return new Promise<InteractionRepository>(async (resolve, reject) => {
 			try {
 				const cat = await CatRepository.getOrCreateFromMessage(_message);
-				const user = await User.getOrCreateFromMessage(_message);
+				const user = await UserRepository.getOrCreateFromMessage(_message);
 				await user.increaseCoin(1);
 				const channel = await Channel.getOrCreateFromMessage(_message);
 				const relation = await Relation.getRelation({ user: user, cat: cat });
