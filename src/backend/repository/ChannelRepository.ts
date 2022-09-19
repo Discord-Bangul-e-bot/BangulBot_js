@@ -4,7 +4,7 @@ import { BaseModelQueryParam, MessageBase } from 'src/backend/types';
 import { DEFAULTCATNAME } from 'src/const';
 
 @RepositoryDecorator<Channel>()
-class UserRepository {
+class ChannelRepository {
 	model: Channel;
 
 	public static getOrCreate(args: BaseModelQueryParam): Promise<Channel> {
@@ -34,7 +34,7 @@ class UserRepository {
 			name = channel.name;
 		}
 		return new Promise<Channel>((resolve, reject) => {
-			UserRepository.getOrCreate({ id: channel_id, name: name }).then(resolve).catch(reject);
+			ChannelRepository.getOrCreate({ id: channel_id, name: name }).then(resolve).catch(reject);
 		});
 	}
 
@@ -49,4 +49,4 @@ class UserRepository {
 	}
 }
 
-export default UserRepository;
+export default ChannelRepository;
