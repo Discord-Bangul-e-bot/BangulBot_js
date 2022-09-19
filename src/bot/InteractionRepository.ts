@@ -4,8 +4,8 @@ import Channel from 'src/backend/entity/Channel';
 import Message from 'src/backend/entity/Message';
 import Relation from 'src/backend/entity/Relation';
 import User from 'src/backend/entity/User';
+import CatRepository from 'src/backend/repository/CatRepository';
 import { MessageBase } from 'src/backend/types';
-import MyClient from 'src/bot/MyClient';
 import { CHURRPRICE } from 'src/const';
 
 type InteractionCreateDTO = {
@@ -25,7 +25,7 @@ type GiveChurrResult = {
 	insufficient: number;
 };
 
-class Interaction {
+class InteractionRepository {
 	cat: Cat;
 	channel: Channel;
 	user: User;
@@ -61,13 +61,13 @@ class Interaction {
 	static builderFromInteraction(interaction: Discord.Interaction) {
 		const guild = interaction.guild;
 		const channel = interaction.channel;
-		return Interaction.builderFromMessage({ guild, channel, author: interaction.user, content: '' });
+		return InteractionRepository.builderFromMessage({ guild, channel, author: interaction.user, content: '' });
 	}
 
 	static builderFromMessage(_message: MessageBase) {
-		return new Promise<Interaction>(async (resolve, reject) => {
+		return new Promise<InteractionRepository>(async (resolve, reject) => {
 			try {
-				const cat = await Cat.getOrCreateFromMessage(_message);
+				const cat = await CatRepository.getOrCreateFromMessage(_message);
 				const user = await User.getOrCreateFromMessage(_message);
 				await user.increaseCoin(1);
 				const channel = await Channel.getOrCreateFromMessage(_message);
@@ -76,7 +76,7 @@ class Interaction {
 				if (_message.content) {
 					message = await Message.createFromInteraction(_message);
 				}
-				const interaction = Interaction.create({ user, cat, channel, relation, message });
+				const interaction = InteractionRepository.create({ user, cat: cat, channel, relation, message });
 
 				resolve(interaction);
 			} catch {
@@ -86,7 +86,7 @@ class Interaction {
 	}
 
 	private static create({ user, cat, channel, relation, message }: InteractionCreateDTO) {
-		const instance = new Interaction();
+		const instance = new InteractionRepository();
 		instance.user = user;
 		instance.cat = cat;
 		instance.channel = channel;
@@ -105,4 +105,4 @@ class Interaction {
 	}
 }
 
-export default Interaction;
+export default InteractionRepository;
