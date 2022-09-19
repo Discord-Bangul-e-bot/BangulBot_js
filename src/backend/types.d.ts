@@ -9,6 +9,11 @@ export type AuthorBase = {
 	username: string;
 };
 
+export type BaseModelQueryParam = {
+	id: string;
+	name: string;
+};
+
 export type MessageBase = {
 	author?: Discord.User;
 	channel: Discord.If<Discord.InGuild, Discord.GuildTextBasedChannel, Discord.TextBasedChannel>;
