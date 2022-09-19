@@ -21,35 +21,7 @@ class User extends BaseModel {
 		this.coin = 0;
 	}
 
-	private static getOrCreate(args: { id: string; name: string }) {
-		return new Promise<User>((resolve, reject) => {
-			User.findOneByOrFail({ id: args.id })
-				.then(async (user) => {
-					console.log('getUserFroMDB!');
-					if (this.name !== args.name) {
-						await user.setName(args.name);
-					}
-					resolve(user);
-				})
-				.catch(async () => {
-					console.log('createUser!!');
-					const instance = User.create<User>(args);
-					const savedInstance = await instance.save();
-					resolve(savedInstance);
-				});
-		});
-	}
-
-	static getOrCreateFromMessage(message: MessageBase) {
-		return new Promise<User>((resolve, reject) => {
-			const author = message.author;
-			const id = author.id;
-			const name = author.username;
-			User.getOrCreate({ id, name }).then(resolve).catch(reject);
-		});
-	}
-
-	private async setName(name: string) {
+	async setName(name: string) {
 		this.name = name;
 		return this.save();
 	}
