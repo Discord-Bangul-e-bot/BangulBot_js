@@ -2,7 +2,8 @@ import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import { AppDataSource } from './backend/data-source';
 import client from './bot/client';
-import MessageInteraction from './bot/MessageInteraction';
+import Interaction from 'src/bot/Interaction';
+import MessageInteraction from 'src/bot/MessageInteraction';
 
 AppDataSource.initialize()
 	.then(() => {
@@ -23,6 +24,8 @@ client.once('ready', () => {
 // FUNCTION 인터랙션 응답 설정
 client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 	console.log('interaction Create');
+	const interact = await Interaction.builderFromInteraction(interaction);
+
 	if (!interaction.isChatInputCommand()) return;
 
 	switch (interaction.commandName) {
@@ -37,7 +40,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 			break;
 		case '이름변경':
 			const newName = interaction.options.getString('name');
-			client.setName(newName);
+			interact.cat.setName(newName);
 			await interaction.reply(`SYSTEM : 고양이의 이름은 ${newName}입니다.`);
 			break;
 		default:
