@@ -1,11 +1,15 @@
 import User from 'src/backend/entity/User';
-import { RepositoryDecorator } from 'src/backend/repository';
+import BaseRepository, { RepositoryDecorator } from 'src/backend/repository';
 import { BaseModelQueryParam, MessageBase } from 'src/backend/types';
 import { DEFAULTCATNAME } from 'src/const';
 
 @RepositoryDecorator<User>()
-class UserRepository {
+class UserRepository extends BaseRepository<User> {
 	model: User;
+
+	constructor(model: User) {
+		super(model);
+	}
 
 	public static getOrCreate(args: BaseModelQueryParam): Promise<User> {
 		return new Promise<User>((resolve, reject) => {
@@ -33,14 +37,28 @@ class UserRepository {
 		});
 	}
 
-	getName() {
-		return this.model.name;
+	async increaseCoin(amount: number) {
+		if (!this.setCoinAvailable(amount)) {
+			return false;
+		}
+		await this.model.setCoin(amount);
+		return true;
 	}
 
-	async setName(name: string) {
-		this.model.name = name;
-		await this.model.save();
-		return;
+	async decreaseCoin(amount: number) {
+		if (!this.setCoinAvailable(-amount)) {
+			return false;
+		}
+		await this.model.setCoin(-amount);
+		return true;
+	}
+
+	setCoinAvailable(amount: number = 1) {
+		const target = this.model.coin + amount;
+		if (0 > target) {
+			return false;
+		}
+		return true;
 	}
 }
 

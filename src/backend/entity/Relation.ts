@@ -48,39 +48,6 @@ class Relation extends BaseModel {
 		this.intimacy += amount;
 		await this.save();
 	}
-
-	static getRelation(args: { user: User; cat: Cat }) {
-		return new Promise<Relation>((resolve, reject) => {
-			Relation.findOneByOrFail({
-				cat: { id: args.cat.id },
-				user: { id: args.user.id },
-			})
-				.then(resolve)
-				.catch(async () => {
-					console.log('relation create!');
-					console.table(args);
-					const instance = Relation.createDefault({ cat: args.cat, user: args.user });
-					console.log('instance create!');
-					await instance.save();
-					resolve(instance);
-				});
-		});
-	}
-	static getRelationFromMessage(message: Discord.Message) {
-		return new Promise(async (resolve, reject) => {
-			const user = await UserRepository.getOrCreateFromMessage(message);
-			const cat = await CatRepository.getOrCreateFromMessage(message);
-			Relation.getRelation({ user, cat }).then(resolve).catch(reject);
-		});
-	}
-	private static createDefault({ cat, user }: { cat: Cat; user: User }) {
-		const instance = new Relation();
-		instance.user = user;
-		instance.cat = cat;
-		instance.intimacy = 0;
-		instance.name = 'relation';
-		return instance;
-	}
 }
 
 export default Relation;
