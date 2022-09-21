@@ -1,10 +1,12 @@
 import Discord, { InteractionType } from 'discord.js';
-import { BeforeInsert, Column, DeepPartial, Entity, FindOneOptions, OneToMany } from 'typeorm';
+import { BeforeInsert, Column, DeepPartial, Entity, FindOneOptions, JoinColumn, OneToMany } from 'typeorm';
 import BaseModel from 'src/backend/entity/BaseModel';
 import Relation from 'src/backend/entity/Relation';
 import { QueryPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { MessageBase } from 'src/backend/types';
 import { DEFAULTCATNAME, FEELHUNGRY } from 'src/const';
+import Channel from 'src/backend/entity/Channel';
+import { channel } from 'diagnostics_channel';
 @Entity()
 class Cat extends BaseModel {
 	@OneToMany((type) => Relation, (relation) => relation.cat)
@@ -15,6 +17,10 @@ class Cat extends BaseModel {
 
 	@Column({ default: DEFAULTCATNAME })
 	name: string;
+
+	@OneToMany((type) => Channel, (channel) => channel.cat, { cascade: true })
+	@JoinColumn()
+	channels: Channel[];
 
 	@BeforeInsert()
 	beforeInsertActions() {

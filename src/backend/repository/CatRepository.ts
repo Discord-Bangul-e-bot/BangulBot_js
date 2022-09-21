@@ -32,6 +32,13 @@ class CatRepository extends BaseRepository<Cat> {
 			CatRepository.getOrCreate({ id: guild_id, name: name }).then(resolve).catch(reject);
 		});
 	}
+
+	public static getAll(): Promise<Cat[]> {
+		return new Promise<Cat[]>(async (resolve, reject) => {
+			const cats = await Cat.find();
+			resolve(cats);
+		});
+	}
 }
 
 export default CatRepository;

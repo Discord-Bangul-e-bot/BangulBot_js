@@ -1,13 +1,17 @@
 import Channel from 'src/backend/entity/Channel';
-import { RepositoryDecorator } from 'src/backend/repository';
+import BaseRepository, { RepositoryDecorator } from 'src/backend/repository';
 import { BaseModelQueryParam, MessageBase } from 'src/backend/types';
 import { DEFAULTCATNAME } from 'src/const';
 
 @RepositoryDecorator<Channel>()
-class ChannelRepository {
+class ChannelRepository extends BaseRepository<Channel> {
 	model: Channel;
 
-	public static getOrCreate(args: BaseModelQueryParam): Promise<Channel> {
+	constructor(model: Channel) {
+		super(model);
+	}
+
+	public static getOrCreate(args: BaseModelQueryParam & { cat_id: string }): Promise<Channel> {
 		return new Promise<Channel>((resolve, reject) => {
 			Channel.findOneByOrFail({ id: args.id })
 				.then(async (model) => {
@@ -17,7 +21,7 @@ class ChannelRepository {
 					resolve(model);
 				})
 				.catch(async () => {
-					const instance = Channel.create<Channel>({ id: args.id, name: DEFAULTCATNAME });
+					const instance = Channel._create({ id: args.id, cat_id: args.cat_id, name: DEFAULTCATNAME });
 					const savedInstance = await instance.save();
 					resolve(savedInstance);
 				});
@@ -27,6 +31,7 @@ class ChannelRepository {
 	public static getOrCreateFromMessage(message: MessageBase): Promise<Channel> {
 		const channel = message.channel;
 		const channel_id = channel.id;
+		const cat_id = message.guild.id;
 		let name: string;
 		if (channel.isDMBased()) {
 			name = 'default';
@@ -34,18 +39,8 @@ class ChannelRepository {
 			name = channel.name;
 		}
 		return new Promise<Channel>((resolve, reject) => {
-			ChannelRepository.getOrCreate({ id: channel_id, name: name }).then(resolve).catch(reject);
+			ChannelRepository.getOrCreate({ id: channel_id, name: name, cat_id: cat_id }).then(resolve).catch(reject);
 		});
-	}
-
-	getName() {
-		return this.model.name;
-	}
-
-	async setName(name: string) {
-		this.model.name = name;
-		await this.model.save();
-		return;
 	}
 }
 
