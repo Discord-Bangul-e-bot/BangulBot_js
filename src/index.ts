@@ -4,10 +4,12 @@ import { AppDataSource } from './backend/data-source';
 import client from './bot/client';
 import InteractionRepository from 'src/bot/InteractionRepository';
 import MessageInteraction from 'src/bot/MessageInteraction';
+import CatRepository from './backend/repository/CatRepository';
 
 AppDataSource.initialize()
 	.then(() => {
 		console.log('Database Connected!');
+		client.login(token);
 	})
 	.catch(() => {
 		console.log('Database Connect Failed!');
@@ -18,6 +20,7 @@ dotenv.config();
 const token = process.env.DISCORD_TOKEN;
 // NOTE: 봇 실행시 실행
 client.once('ready', () => {
+	client.cronTask();
 	console.log('MEOW');
 });
 
@@ -55,7 +58,5 @@ client.on('messageCreate', MessageInteraction);
 client.on('message', (message) => {
 	console.log(message.content);
 });
-
-client.login(token);
 
 export default client;
