@@ -28,6 +28,14 @@ const MessageInteraction = async (message: Discord.Message) => {
 		return;
 	}
 
+	if (msgCommand === '손') {
+		const result = repository.askGiveHand();
+		const formattedReply = new repository.formatter(result.message).quote().toString();
+
+		message.reply(formattedReply);
+		return;
+	}
+
 	if (msgCommand.startsWith('마크다운테스트')) {
 		const spiltedCommand = msgCommand.split(' ');
 		const reply = '미애웅?';

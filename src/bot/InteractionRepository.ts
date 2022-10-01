@@ -68,7 +68,26 @@ class InteractionRepository {
 		}
 		await this.user.decreaseCoin(totalPrice);
 		await this.cat.increaseHungry(amount);
+		await this.relation.increaseIntimacy(amount);
 		return { ...giveChurrResult, message: `${this.cat.getName()}은 츄르를 맛있게 먹었어요` };
+	}
+
+	askGiveHand() {
+		const probality = Math.floor(Math.random() * 101);
+		let result = {
+			probality: probality,
+			relation: this.relation,
+			message: '',
+		};
+
+		if (probality < 50) {
+			result = { ...result, message: `${this.cat.getName()}는(은) 외면중이다..` };
+		} else if (probality < 75) {
+			result = { ...result, message: `${this.cat.getName()}(이)가 오른발을 올려줬다.` };
+		} else {
+			result = { ...result, message: `${this.cat.getName()}(이)가 왼발을 올려줬다.` };
+		}
+		return result;
 	}
 
 	static builderFromInteraction(interaction: Discord.Interaction) {
