@@ -19,7 +19,7 @@ class CatRepository extends BaseRepository<Cat> {
 	 * }
 	 */
 
-	announceHungry(client: Client, cb: (interaction: Discord.Channel, cat: Cat) => void) {
+	announceHungry(client: Client, cb: (interaction: Discord.TextBasedChannel, cat: Cat) => void) {
 		if (this.model.isHungry()) {
 			for (const channel of this.model.channels) {
 				if (channel.name == '급식소') {
