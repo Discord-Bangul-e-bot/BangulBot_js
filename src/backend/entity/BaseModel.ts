@@ -1,9 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, PrimaryColumn, BeforeInsert } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	BaseEntity,
+	PrimaryColumn,
+	BeforeInsert,
+	ValueTransformer,
+	Generated,
+} from 'typeorm';
+
+function bigIntValidator(num: bigint) {
+	if (num.toString().length >= 20) {
+		num = BigInt(num.toString().substring(0, 10));
+	}
+	return num;
+}
+
+export const bigint: ValueTransformer = {
+	to: (entityValue: bigint) => bigIntValidator(entityValue),
+	from: (databaseValue: string): bigint => bigIntValidator(BigInt(databaseValue)),
+};
 
 @Entity()
 class BaseModel extends BaseEntity {
-	@PrimaryGeneratedColumn('increment', { type: 'bigint' })
-	id: number;
+	@Generated('uuid')
+	@PrimaryColumn('varchar')
+	id: string;
 
 	@Column()
 	name: string;
@@ -14,6 +36,9 @@ class BaseModel extends BaseEntity {
 	@BeforeInsert()
 	beforeInsertActions() {
 		this.createdAt = new Date();
+	}
+	async save() {
+		return await super.save();
 	}
 }
 

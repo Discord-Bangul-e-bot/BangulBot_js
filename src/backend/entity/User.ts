@@ -1,61 +1,66 @@
-import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
-import BaseModel from 'src/backend/entity/BaseModel';
 import Discord from 'discord.js';
+import BaseModel from 'src/backend/entity/BaseModel';
 import Message from 'src/backend/entity/Message';
 import Relation from 'src/backend/entity/Relation';
+import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
+import { MessageBase } from '../types';
+import Inventory from 'src/backend/entity/Inventory';
 
 @Entity()
 class User extends BaseModel {
 	@Column({ default: 0 })
 	coin: number;
 
-	@OneToMany((type) => Message, (message) => message.user)
+	@OneToMany((type) => Message, (message) => message.user, { cascade: true })
 	messages: Message[];
 
-	@OneToMany((type) => Relation, (relation) => relation.user)
+	@OneToMany((type) => Relation, (relation) => relation.user, { cascade: true })
 	relations: Relation[];
+
+	@OneToMany((type) => Inventory, (inventory) => inventory.user, { cascade: true })
+	inventory: Inventory[];
 
 	@BeforeInsert()
 	beforeInsertActions() {
 		this.coin = 0;
 	}
 
-	static createOrGetFromInteraction(interaction: Discord.Message) {
-		return new Promise<User>((resolve, reject) => {
-			const author = interaction.author;
-			const id = parseInt(author.id, 10);
-			const name = author.username;
-			User.findOneByOrFail({ id })
-				.then(async (user) => {
-					console.log('get exist User!');
-					user.name = name;
-					await user.save();
-					resolve(user);
-				})
-				.catch(async () => {
-					const instance = User.create({ id, name });
-					const savedInstance = await instance.save();
-					console.log('create new User!');
-					resolve(savedInstance);
-				})
-				.catch(() => reject());
-		});
+	async setName(name: string) {
+		this.name = name;
+		return this.save();
 	}
 
 	async increaseCoin(amount: number) {
-		this.coin += amount;
-		const saved = await this.save();
-		return saved;
+		if (!this.setCoinAvailable(amount)) {
+			return false;
+		}
+		this.setCoin(amount);
+		return true;
 	}
 
 	async decreaseCoin(amount: number) {
-		if (this.coin - amount < 0) {
+		if (!this.setCoinAvailable(-amount)) {
 			return false;
-		} else {
-			this.coin += amount;
-			const saved = await this.save();
-			return saved;
 		}
+		this.setCoin(-amount);
+		return true;
+	}
+
+	setCoinAvailable(amount: number) {
+		const target = this.coin + amount;
+		if (0 > target) {
+			return false;
+		}
+		return true;
+	}
+
+	async setCoin(amount: number) {
+		this.coin += amount;
+		return await this.save();
+	}
+
+	buyAvailable(coin: number) {
+		return this.coin - coin;
 	}
 }
 

@@ -1,1 +1,2 @@
-npm run dev
+# npm run dev
+tail -f /dev/null

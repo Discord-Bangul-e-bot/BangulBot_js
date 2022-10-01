@@ -2,13 +2,19 @@ import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import { AppDataSource } from './backend/data-source';
 import client from './bot/client';
-import MessageInteraction from './bot/MessageInteraction';
+import InteractionRepository from 'src/bot/InteractionRepository';
+import MessageInteraction from 'src/bot/MessageInteraction';
+import CatRepository from './backend/repository/CatRepository';
+import initialize from 'src/backend/initialize';
 
 AppDataSource.initialize()
-	.then(() => {
+	.then(async () => {
 		console.log('Database Connected!');
+		await initialize();
+		client.login(token);
 	})
-	.catch(() => {
+	.catch((e) => {
+		console.log(e);
 		console.log('Database Connect Failed!');
 	});
 
@@ -17,15 +23,17 @@ dotenv.config();
 const token = process.env.DISCORD_TOKEN;
 // NOTE: 봇 실행시 실행
 client.once('ready', () => {
+	client.cronTask();
 	console.log('MEOW');
 });
 
-// FIXME: 상호작용 방법을 찾아야됨
+// FUNCTION 인터랙션 응답 설정
 client.on('interactionCreate', async (interaction: Discord.Interaction) => {
-	console.log('interaction Create');
+	const interactionRepository = await InteractionRepository.builderFromInteraction(interaction);
+
 	if (!interaction.isChatInputCommand()) return;
 
-	switch(interaction.commandName){
+	switch (interaction.commandName) {
 		case 'stats':
 			await interaction.reply(`Server count: ${client.guilds.cache.size}.`);
 			break;
@@ -34,6 +42,11 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 			break;
 		case '김한얼':
 			await interaction.reply('바보');
+			break;
+		case '이름변경':
+			const newName = interaction.options.getString('name');
+			interactionRepository.cat.setName(newName);
+			await interaction.reply(`SYSTEM : 고양이의 이름은 ${newName}입니다.`);
 			break;
 		default:
 			break;
@@ -47,7 +60,5 @@ client.on('messageCreate', MessageInteraction);
 client.on('message', (message) => {
 	console.log(message.content);
 });
-
-client.login(token);
 
 export default client;
