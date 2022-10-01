@@ -19,17 +19,29 @@ class CatRepository extends BaseRepository<Cat> {
 	 * }
 	 */
 
-	announceHungry(client: Client, cb: (interaction: Discord.TextBasedChannel, cat: Cat) => void) {
+	announceHungry(client: Client, cb: (interaction: Discord.TextBasedChannel, cat: CatRepository) => void) {
 		if (this.model.isHungry()) {
 			for (const channel of this.model.channels) {
 				if (channel.name == '급식소') {
 					const interaction = client.channels.cache.get(channel.id);
 					if (interaction.isTextBased()) {
-						cb(interaction, this.model);
+						cb(interaction, this);
 					}
 				}
 			}
 		}
+	}
+
+	setHungryAvailable(amount) {
+		return this.model.setHungryAvailable(amount);
+	}
+
+	async increaseHungry(amount) {
+		return this.model.increaseHungry(amount);
+	}
+
+	async decreaseHungry(amount) {
+		return this.model.decreaseHungry(amount);
 	}
 
 	public static getOrCreate(args: BaseModelQueryParam): Promise<Cat> {

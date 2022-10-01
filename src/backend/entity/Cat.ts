@@ -14,6 +14,9 @@ class Cat extends BaseModel {
 	@Column()
 	hungry: number;
 
+	@Column()
+	funny: number;
+
 	@Column({ default: DEFAULTCATNAME })
 	name: string;
 
@@ -33,6 +36,36 @@ class Cat extends BaseModel {
 
 	isHungry() {
 		return this.hungry >= FEELHUNGRY ? true : false;
+	}
+
+	async increaseFunny(amount = 1) {
+		if (!this.setFunnyAvailable(amount)) {
+			return false;
+		}
+		await this.setFunny(amount);
+		return true;
+	}
+
+	async decreaseFunny(amount = 1) {
+		if (!this.setFunnyAvailable(-amount)) {
+			return false;
+		}
+		await this.setFunny(-amount);
+		return true;
+	}
+
+	setFunnyAvailable(amount: number) {
+		const target = this.funny + amount;
+		if (0 > target || target > 100) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private async setFunny(amount: number) {
+		this.funny += amount;
+		await this.save();
 	}
 
 	async increaseHungry(amount = 1) {

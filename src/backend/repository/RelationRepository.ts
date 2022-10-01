@@ -14,6 +14,23 @@ class RelationRepository extends BaseRepository<Relation> {
 	constructor(model: Relation) {
 		super(model);
 	}
+
+	getIntimacy() {
+		return this.model.intimacy;
+	}
+
+	setIntimacyAvailable(amount) {
+		return this.model.setIntimacyAvailable;
+	}
+
+	async increaseIntimacy(amount) {
+		return this.model.increaseIntimacy(amount);
+	}
+
+	async decreaseIntimacy(amount) {
+		return this.model.decreaseIntimacy(amount);
+	}
+
 	static getOrCreate(args: { user: User; cat: Cat }) {
 		return new Promise<Relation>((resolve, reject) => {
 			const findargs = {
@@ -34,6 +51,7 @@ class RelationRepository extends BaseRepository<Relation> {
 				});
 		});
 	}
+
 	static getOrCreateFromMessage(message: MessageBase) {
 		return new Promise<Relation>(async (resolve, reject) => {
 			const user = await UserRepository.getOrCreateFromMessage(message);
