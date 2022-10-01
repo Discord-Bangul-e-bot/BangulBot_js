@@ -6,6 +6,7 @@ import Relation from 'src/backend/entity/Relation';
 import User from 'src/backend/entity/User';
 import CatRepository from 'src/backend/repository/CatRepository';
 import ChannelRepository from 'src/backend/repository/ChannelRepository';
+import ItemRepository from 'src/backend/repository/ItemRepository';
 import RelationRepository from 'src/backend/repository/RelationRepository';
 import UserRepository from 'src/backend/repository/UserRepository';
 import { MessageBase } from 'src/backend/types';
@@ -44,6 +45,14 @@ class InteractionRepository {
 		this.channel = args.channel;
 		this.relation = args.relation;
 		this.message = args.message;
+	}
+	async openStore() {
+		const items = await ItemRepository.getItems();
+		return items;
+	}
+
+	async findItem(name: string) {
+		const itemRepo = await ItemRepository.findItem(name);
 	}
 
 	async giveChurr(amount: number = 1): Promise<GiveChurrResult> {
@@ -101,8 +110,6 @@ class InteractionRepository {
 			try {
 				const cat = await CatRepository.getOrCreateFromMessage(_message);
 				const catRepo = new CatRepository(cat);
-				console.log('catRepo');
-				console.table(catRepo);
 				const user = await UserRepository.getOrCreateFromMessage(_message);
 				await user.increaseCoin(1);
 				const channel = await ChannelRepository.getOrCreateFromMessage(_message);

@@ -4,6 +4,7 @@ import Message from 'src/backend/entity/Message';
 import Relation from 'src/backend/entity/Relation';
 import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { MessageBase } from '../types';
+import Inventory from 'src/backend/entity/Inventory';
 
 @Entity()
 class User extends BaseModel {
@@ -15,6 +16,9 @@ class User extends BaseModel {
 
 	@OneToMany((type) => Relation, (relation) => relation.user, { cascade: true })
 	relations: Relation[];
+
+	@OneToMany((type) => Inventory, (inventory) => inventory.user, { cascade: true })
+	inventory: Inventory[];
 
 	@BeforeInsert()
 	beforeInsertActions() {

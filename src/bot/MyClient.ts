@@ -28,10 +28,8 @@ class MyClient extends Discord.Client {
 		 * 초 분 시 일 월 년
 		 */
 		cron.schedule('0 * * * * *', () => {
-			console.log('cat hungry tasks injected');
 			CatRepository.getAll().then((cats) => {
 				for (const cat of cats) {
-					console.log(cat.repository);
 					cat.increaseHungry();
 					cat.save();
 					console.log(`${cat.getName()}의 배고픔 + 1`);
@@ -64,6 +62,7 @@ class MyClient extends Discord.Client {
 			command: '',
 		};
 		if (this.isBotMessge(message, interactionRepository)) {
+			console.log('its bot message!');
 			return result;
 		}
 		if (!messageContent.startsWith(interactionRepository.cat.name)) return result;

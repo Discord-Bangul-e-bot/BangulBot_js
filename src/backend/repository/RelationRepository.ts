@@ -16,12 +16,15 @@ class RelationRepository extends BaseRepository<Relation> {
 	}
 	static getOrCreate(args: { user: User; cat: Cat }) {
 		return new Promise<Relation>((resolve, reject) => {
-			Relation.findOneByOrFail({
+			const findargs = {
 				cat: { id: args.cat.id },
 				user: { id: args.user.id },
-			})
+			};
+			console.log(findargs);
+			Relation.findOneByOrFail(findargs)
 				.then(resolve)
-				.catch(async () => {
+				.catch(async (e) => {
+					console.log(e);
 					console.log('relation create!');
 					console.table(args);
 					const instance = RelationRepository.createDefault({ cat: args.cat, user: args.user });

@@ -6,18 +6,27 @@ import InteractionRepository from 'src/bot/InteractionRepository';
 
 const MessageInteraction = async (message: Discord.Message) => {
 	const repository = await InteractionRepository.builderFromMessage(message);
+	console.log(repository.relation.intimacy);
 	const command = client.getCommandFromMessage(message, repository);
 	const msgCommand = command.command;
 
 	console.table(command);
-	message;
 	if (!command.acceptable) return;
 
 	if (msgCommand === '야옹해봐') {
 		const reply = '에옹?';
 		const formattedReply = new repository.formatter(reply).italic().toString();
-
 		message.channel.send(formattedReply);
+		return;
+	}
+	if (msgCommand === '상점열기') {
+		const items = await repository.openStore();
+		message.reply(items.map((item) => `${[item.name, item.price].join(':')}원`).join(','));
+		return;
+	}
+
+	if (msgCommand == '야옹해봐') {
+		message.channel.send('에옹?');
 		return;
 	}
 	if (msgCommand === '츄르주기') {

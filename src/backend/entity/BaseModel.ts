@@ -13,7 +13,6 @@ function bigIntValidator(num: bigint) {
 	if (num.toString().length >= 20) {
 		num = BigInt(num.toString().substring(0, 10));
 	}
-	console.log('bigint', num);
 	return num;
 }
 

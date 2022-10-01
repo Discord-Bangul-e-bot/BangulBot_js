@@ -5,13 +5,16 @@ import client from './bot/client';
 import InteractionRepository from 'src/bot/InteractionRepository';
 import MessageInteraction from 'src/bot/MessageInteraction';
 import CatRepository from './backend/repository/CatRepository';
+import initialize from 'src/backend/initialize';
 
 AppDataSource.initialize()
-	.then(() => {
+	.then(async () => {
 		console.log('Database Connected!');
+		await initialize();
 		client.login(token);
 	})
-	.catch(() => {
+	.catch((e) => {
+		console.log(e);
 		console.log('Database Connect Failed!');
 	});
 
@@ -26,7 +29,6 @@ client.once('ready', () => {
 
 // FUNCTION 인터랙션 응답 설정
 client.on('interactionCreate', async (interaction: Discord.Interaction) => {
-	console.log('interaction Create');
 	const interactionRepository = await InteractionRepository.builderFromInteraction(interaction);
 
 	if (!interaction.isChatInputCommand()) return;

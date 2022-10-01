@@ -37,6 +37,10 @@ class UserRepository extends BaseRepository<User> {
 		});
 	}
 
+	hasCoin(amount: number) {
+		return this.model.coin >= amount;
+	}
+
 	async increaseCoin(amount: number) {
 		if (!this.setCoinAvailable(amount)) {
 			return false;

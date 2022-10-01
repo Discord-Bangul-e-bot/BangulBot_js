@@ -18,16 +18,13 @@ class Message extends BaseModel {
 			const author = interaction.author;
 			const id = author.id;
 			const message = interaction.content;
-			console.log(id);
 			User.findOneByOrFail({ id })
 				.then(async (user) => {
 					const instance = Message.create({ user, message, name: 'message' });
 					const saved = await instance.save();
-					console.log('messageCreated!');
 					resolve(saved);
 				})
 				.catch(() => {
-					console.log('messageNotCreated');
 					reject();
 				});
 		});
