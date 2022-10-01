@@ -6,14 +6,14 @@ import Relation from 'src/backend/entity/Relation';
 import User from 'src/backend/entity/User';
 import CatRepository from 'src/backend/repository/CatRepository';
 import ChannelRepository from 'src/backend/repository/ChannelRepository';
-import ItemRepository from 'src/backend/repository/ItemRepository';
 import RelationRepository from 'src/backend/repository/RelationRepository';
 import UserRepository from 'src/backend/repository/UserRepository';
 import { MessageBase } from 'src/backend/types';
+import MarketService from 'src/bot/services/MarketService';
+import Formatter from 'src/bot/util/formatter';
 import { CHURRPRICE } from 'src/const';
-import Formatter from './util/formatter';
 
-type InteractionCreateDTO = {
+export type InteractionCreateDTO = {
 	cat: Cat;
 	channel: Channel;
 	user: User;
@@ -30,29 +30,23 @@ type GiveChurrResult = {
 	insufficient: number;
 };
 
-class InteractionRepository {
+class InteractionService {
 	formatter: typeof Formatter = Formatter;
-	cat: Cat;
-	channel: Channel;
-	user: User;
-	relation: Relation;
+	cat: CatRepository;
+	channel: ChannelRepository;
+	user: UserRepository;
+	relation: RelationRepository;
 	message?: Message;
 	interaction: Discord.Interaction;
+	marketService: MarketService;
 
 	constructor(args: InteractionCreateDTO) {
-		this.user = args.user;
-		this.cat = args.cat;
-		this.channel = args.channel;
-		this.relation = args.relation;
+		this.user = new UserRepository(args.user);
+		this.cat = new CatRepository(args.cat);
+		this.channel = new ChannelRepository(args.channel);
+		this.relation = new RelationRepository(args.relation);
 		this.message = args.message;
-	}
-	async openStore() {
-		const items = await ItemRepository.getItems();
-		return items;
-	}
-
-	async findItem(name: string) {
-		const itemRepo = await ItemRepository.findItem(name);
+		this.marketService = new MarketService(args);
 	}
 
 	async giveChurr(amount: number = 1): Promise<GiveChurrResult> {
@@ -102,11 +96,11 @@ class InteractionRepository {
 	static builderFromInteraction(interaction: Discord.Interaction) {
 		const guild = interaction.guild;
 		const channel = interaction.channel;
-		return InteractionRepository.builderFromMessage({ guild, channel, author: interaction.user, content: '' });
+		return InteractionService.builderFromMessage({ guild, channel, author: interaction.user, content: '' });
 	}
 
 	static builderFromMessage(_message: MessageBase) {
-		return new Promise<InteractionRepository>(async (resolve, reject) => {
+		return new Promise<InteractionService>(async (resolve, reject) => {
 			try {
 				const cat = await CatRepository.getOrCreateFromMessage(_message);
 				const catRepo = new CatRepository(cat);
@@ -118,7 +112,7 @@ class InteractionRepository {
 				if (_message.content) {
 					message = await Message.createFromInteraction(_message);
 				}
-				const interaction = InteractionRepository.create({ user, cat: cat, channel, relation, message });
+				const interaction = InteractionService.create({ user, cat: cat, channel, relation, message });
 
 				resolve(interaction);
 			} catch {
@@ -128,7 +122,7 @@ class InteractionRepository {
 	}
 
 	private static create(arg: InteractionCreateDTO) {
-		return new InteractionRepository(arg);
+		return new InteractionService(arg);
 	}
 
 	getCatName() {
@@ -141,4 +135,4 @@ class InteractionRepository {
 	}
 }
 
-export default InteractionRepository;
+export default InteractionService;

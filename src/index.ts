@@ -2,7 +2,7 @@ import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import { AppDataSource } from './backend/data-source';
 import client from './bot/client';
-import InteractionRepository from 'src/bot/InteractionRepository';
+import InteractionRepository from 'src/bot/InteractionService';
 import MessageInteraction from 'src/bot/MessageInteraction';
 import CatRepository from './backend/repository/CatRepository';
 import initialize from 'src/backend/initialize';
