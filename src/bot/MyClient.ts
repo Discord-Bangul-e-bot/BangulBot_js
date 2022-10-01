@@ -57,8 +57,8 @@ class MyClient extends Discord.Client {
 		}
 	}
 
-	isBotMessge(message: MessageBase, interaction: InteractionRepository) {
-		return message.author.id === interaction.cat.model.id;
+	isBotMessge(message: MessageBase) {
+		return process.env.CLIENT_ID === message.author.id;
 	}
 
 	getCommandFromMessage(message: MessageBase, interactionRepository: InteractionRepository) {
@@ -68,11 +68,9 @@ class MyClient extends Discord.Client {
 			command: '',
 			arguments: [],
 		};
-		if (this.isBotMessge(message, interactionRepository)) {
-			console.log('its bot message!');
-			return result;
-		}
+		if (this.isBotMessge(message)) return result;
 		if (!messageContent.startsWith(interactionRepository.cat.getName())) return result;
+
 		const message_split = messageContent.split(' ');
 		if (message_split.length == 1) return result;
 		const command = message_split.splice(1, 2)[0];
