@@ -1,15 +1,4 @@
-import {
-	bold,
-	italic,
-	strikethrough,
-	underscore,
-	spoiler,
-	quote,
-	blockQuote,
-	channelMention,
-	roleMention,
-	userMention,
-} from 'discord.js';
+import { bold, italic, strikethrough, underscore, spoiler, quote, blockQuote } from 'discord.js';
 
 class Formatter {
 	message: string;
@@ -22,6 +11,26 @@ class Formatter {
 	}
 	italic() {
 		this.message = italic(this.message);
+		return this;
+	}
+	strikethrough() {
+		this.message = strikethrough(this.message);
+		return this;
+	}
+	underscore() {
+		this.message = underscore(this.message);
+		return this;
+	}
+	spoiler() {
+		this.message = spoiler(this.message);
+		return this;
+	}
+	quote() {
+		this.message = quote(this.message);
+		return this;
+	}
+	blockQuote() {
+		this.message = blockQuote(this.message);
 		return this;
 	}
 	toString() {
