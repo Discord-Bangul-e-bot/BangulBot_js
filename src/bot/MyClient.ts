@@ -1,8 +1,9 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
+import cron from 'node-cron';
+import CatRepository from 'src/backend/repository/CatRepository';
 import { MessageBase } from 'src/backend/types';
-import Interaction from 'src/bot/Interaction';
-
+import InteractionRepository from 'src/bot/InteractionRepository';
 dotenv.config();
 
 // NOTE: Client에서 사용 할 기능들을 래핑해줌
@@ -18,6 +19,36 @@ class MyClient extends Discord.Client {
 			return MyClient.instance;
 		}
 	}
+	/**
+	 * 주기적 태스크를 실행함
+	 */
+	cronTask() {
+		const client = this;
+		cron.schedule('0 * * * * *', () => {
+			console.log('cat hungry tasks injected');
+			CatRepository.getAll().then((cats) => {
+				for (const cat of cats) {
+					console.log(cat.repository);
+					cat.increaseHungry();
+					cat.save();
+					console.log(`${cat.getName()}의 배고픔 + 1`);
+				}
+			});
+		});
+		cron.schedule('0 0 * * * *', () => {
+			CatRepository.getAll().then((cats) => {
+				for (const cat of cats) {
+					cat.repository.announceHungry(client, (interaction, cat) => {
+						interaction.send(`${cat.getName()}은 배고파요`);
+						interaction.send(`야옹`);
+					});
+				}
+			});
+		});
+		for (const task of cron.getTasks()) {
+			task[1].start();
+		}
+	}
 
 	isBotMessge(interaction: Discord.Message) {
 		console.log(this.user);
@@ -25,14 +56,14 @@ class MyClient extends Discord.Client {
 		return true;
 	}
 
-	getCommandFromMessage(message: MessageBase, interaction: Interaction) {
+	getCommandFromMessage(message: MessageBase, InteractionRepository: InteractionRepository) {
 		const messageContent = message.content;
 		const result = {
 			acceptable: false,
 			command: '',
 		};
 		// if (this.isBotMessge(interaction)) return result;
-		if (!messageContent.startsWith(interaction.cat.name)) return result;
+		if (!messageContent.startsWith(InteractionRepository.cat.name)) return result;
 		const message_split = messageContent.split(' ');
 		if (message_split.length == 1) return result;
 		const command = message_split.splice(1, message_split.length - 1).join(' ');

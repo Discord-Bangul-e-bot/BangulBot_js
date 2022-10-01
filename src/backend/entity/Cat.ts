@@ -1,12 +1,13 @@
-import Discord, { InteractionType } from 'discord.js';
-import { BeforeInsert, Column, DeepPartial, Entity, FindOneOptions, OneToMany } from 'typeorm';
 import BaseModel from 'src/backend/entity/BaseModel';
+import Channel from 'src/backend/entity/Channel';
 import Relation from 'src/backend/entity/Relation';
-import { QueryPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { MessageBase } from 'src/backend/types';
+import CatRepository from 'src/backend/repository/CatRepository';
 import { DEFAULTCATNAME, FEELHUNGRY } from 'src/const';
+import { BeforeInsert, Column, Entity, JoinColumn, OneToMany } from 'typeorm';
+
 @Entity()
 class Cat extends BaseModel {
+	repository: CatRepository;
 	@OneToMany((type) => Relation, (relation) => relation.cat)
 	relations: Relation[];
 
@@ -16,9 +17,18 @@ class Cat extends BaseModel {
 	@Column({ default: DEFAULTCATNAME })
 	name: string;
 
+	@OneToMany((type) => Channel, (channel) => channel.cat, { cascade: true, eager: true })
+	@JoinColumn()
+	channels: Channel[];
+
 	@BeforeInsert()
 	beforeInsertActions() {
 		this.hungry = 0;
+	}
+
+	constructor() {
+		super();
+		this.repository = new CatRepository(this);
 	}
 
 	isHungry() {
@@ -53,27 +63,6 @@ class Cat extends BaseModel {
 	private async setHungry(amount: number) {
 		this.hungry += amount;
 		await this.save();
-	}
-
-	private static getOrCreate(args: { id: string; name: string }) {
-		return new Promise<Cat>((resolve, reject) => {
-			Cat.findOneByOrFail({ id: args.id })
-				.then(resolve)
-				.catch(async () => {
-					const instance = Cat.create<Cat>({ id: args.id, name: DEFAULTCATNAME });
-					const savedInstance = await instance.save();
-					resolve(savedInstance);
-				});
-		});
-	}
-
-	static getOrCreateFromMessage<T>(message: MessageBase) {
-		const guild = message.guild;
-		const guild_id = guild.id;
-		const name = guild.name;
-		return new Promise<Cat>((resolve, reject) => {
-			Cat.getOrCreate({ id: guild_id, name: name }).then(resolve).catch(reject);
-		});
 	}
 
 	setName(newName: string) {

@@ -2,12 +2,13 @@ import Discord from 'discord.js';
 import User from 'src/backend/entity/User';
 import Message from 'src/backend/entity/Message';
 import client from 'src/bot/client';
-import Interaction from 'src/bot/Interaction';
+import InteractionRepository from 'src/bot/InteractionRepository';
 
 const MessageInteraction = async (message: Discord.Message) => {
-	const interaction = await Interaction.builderFromMessage(message);
-	const command = client.getCommandFromMessage(message, interaction);
+	const repository = await InteractionRepository.builderFromMessage(message);
+	const command = client.getCommandFromMessage(message, repository);
 	console.table(command);
+	message;
 	if (!command.acceptable) return;
 
 	if (command.command == '야옹해봐') {
@@ -15,7 +16,7 @@ const MessageInteraction = async (message: Discord.Message) => {
 		return;
 	}
 	if (command.command == '츄르주기') {
-		const result = await interaction.giveChurr();
+		const result = await repository.giveChurr();
 		message.reply(result.message);
 		return;
 	}

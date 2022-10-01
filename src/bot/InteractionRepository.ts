@@ -4,8 +4,11 @@ import Channel from 'src/backend/entity/Channel';
 import Message from 'src/backend/entity/Message';
 import Relation from 'src/backend/entity/Relation';
 import User from 'src/backend/entity/User';
+import CatRepository from 'src/backend/repository/CatRepository';
+import ChannelRepository from 'src/backend/repository/ChannelRepository';
+import RelationRepository from 'src/backend/repository/RelationRepository';
+import UserRepository from 'src/backend/repository/UserRepository';
 import { MessageBase } from 'src/backend/types';
-import MyClient from 'src/bot/MyClient';
 import { CHURRPRICE } from 'src/const';
 
 type InteractionCreateDTO = {
@@ -25,13 +28,21 @@ type GiveChurrResult = {
 	insufficient: number;
 };
 
-class Interaction {
+class InteractionRepository {
 	cat: Cat;
 	channel: Channel;
 	user: User;
 	relation: Relation;
 	message?: Message;
 	interaction: Discord.Interaction;
+
+	constructor(args: InteractionCreateDTO) {
+		this.user = args.user;
+		this.cat = args.cat;
+		this.channel = args.channel;
+		this.relation = args.relation;
+		this.message = args.message;
+	}
 
 	async giveChurr(amount: number = 1): Promise<GiveChurrResult> {
 		const totalPrice = amount * CHURRPRICE;
@@ -61,22 +72,25 @@ class Interaction {
 	static builderFromInteraction(interaction: Discord.Interaction) {
 		const guild = interaction.guild;
 		const channel = interaction.channel;
-		return Interaction.builderFromMessage({ guild, channel, author: interaction.user, content: '' });
+		return InteractionRepository.builderFromMessage({ guild, channel, author: interaction.user, content: '' });
 	}
 
 	static builderFromMessage(_message: MessageBase) {
-		return new Promise<Interaction>(async (resolve, reject) => {
+		return new Promise<InteractionRepository>(async (resolve, reject) => {
 			try {
-				const cat = await Cat.getOrCreateFromMessage(_message);
-				const user = await User.getOrCreateFromMessage(_message);
+				const cat = await CatRepository.getOrCreateFromMessage(_message);
+				const catRepo = new CatRepository(cat);
+				console.log('catRepo');
+				console.table(catRepo);
+				const user = await UserRepository.getOrCreateFromMessage(_message);
 				await user.increaseCoin(1);
-				const channel = await Channel.getOrCreateFromMessage(_message);
-				const relation = await Relation.getRelation({ user: user, cat: cat });
+				const channel = await ChannelRepository.getOrCreateFromMessage(_message);
+				const relation = await RelationRepository.getOrCreate({ user: user, cat: cat });
 				let message: Message;
 				if (_message.content) {
 					message = await Message.createFromInteraction(_message);
 				}
-				const interaction = Interaction.create({ user, cat, channel, relation, message });
+				const interaction = InteractionRepository.create({ user, cat: cat, channel, relation, message });
 
 				resolve(interaction);
 			} catch {
@@ -85,14 +99,8 @@ class Interaction {
 		});
 	}
 
-	private static create({ user, cat, channel, relation, message }: InteractionCreateDTO) {
-		const instance = new Interaction();
-		instance.user = user;
-		instance.cat = cat;
-		instance.channel = channel;
-		instance.relation = relation;
-		instance.message = message;
-		return instance;
+	private static create(arg: InteractionCreateDTO) {
+		return new InteractionRepository(arg);
 	}
 
 	getCatName() {
@@ -105,4 +113,4 @@ class Interaction {
 	}
 }
 
-export default Interaction;
+export default InteractionRepository;

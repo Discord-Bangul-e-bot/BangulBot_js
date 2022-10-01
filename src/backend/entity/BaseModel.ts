@@ -38,6 +38,9 @@ class BaseModel extends BaseEntity {
 	beforeInsertActions() {
 		this.createdAt = new Date();
 	}
+	async save() {
+		return await super.save();
+	}
 }
 
 export default BaseModel;

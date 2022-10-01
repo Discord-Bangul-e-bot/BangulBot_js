@@ -3,19 +3,23 @@
 	"version": "0.0.1",
 	"description": "방울이 디스코드 봇",
 	"main": "index.ts",
+	"imports": {
+		"src/*": "./src/*"
+	},
 	"engines": {
 		"node": ">= 16.13 <17"
 	},
 	"devDependencies": {
 		"@types/jest": "~27.5",
 		"@types/node": "~16",
+		"@types/node-cron": "^3.0.4",
 		"@typescript-eslint/eslint-plugin": "~5.26",
 		"@typescript-eslint/parser": "~5.26",
 		"eslint": "~8.16",
 		"eslint-config-prettier": "~8.5",
 		"eslint-plugin-jest": "~26.2",
 		"jest": "~28.1",
-		"prettier": "~2.6",
+		"prettier": "^2.7.1",
 		"rimraf": "~3.0",
 		"ts-jest": "~28.0",
 		"ts-node": "^10.9.1",
@@ -24,7 +28,7 @@
 	},
 	"scripts": {
 		"dev": "tsc-watch --onSuccess \"nodemon --exec ts-node -r tsconfig-paths/register build/src/index.js\"",
-		"deploy":"tsc -p tsconfig.json  && node build/src/deploy-commands.js",
+		"deploy": "tsc -p tsconfig.json  && node build/src/deploy-commands.js",
 		"start": "node build/src/index.js",
 		"clean": "rimraf coverage build tmp",
 		"prebuild": "npm run lint",
@@ -43,6 +47,7 @@
 		"dotenv": "^16.0.2",
 		"global": "^4.4.0",
 		"mysql2": "^2.3.3",
+		"node-cron": "^3.0.2",
 		"nodemon": "^2.0.20",
 		"reflect-metadata": "^0.1.13",
 		"tsc-watch": "^5.0.3",
