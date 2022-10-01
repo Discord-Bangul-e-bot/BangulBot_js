@@ -12,12 +12,17 @@ const MessageInteraction = async (message: Discord.Message) => {
 	if (!command.acceptable) return;
 
 	if (command.command == '야옹해봐') {
-		message.channel.send('에옹?');
+		const reply = '에옹?';
+		const formattedReply = new repository.formatter(reply).italic().toString();
+
+		message.channel.send(formattedReply);
 		return;
 	}
 	if (command.command == '츄르주기') {
 		const result = await repository.giveChurr();
-		message.reply(result.message);
+		const formattedReply = new repository.formatter(result.message).bold().toString();
+
+		message.reply(formattedReply);
 		return;
 	}
 	message.reply('야옹');

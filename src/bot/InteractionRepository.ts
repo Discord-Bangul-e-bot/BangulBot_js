@@ -10,6 +10,7 @@ import RelationRepository from 'src/backend/repository/RelationRepository';
 import UserRepository from 'src/backend/repository/UserRepository';
 import { MessageBase } from 'src/backend/types';
 import { CHURRPRICE } from 'src/const';
+import Formatter from './util/formatter';
 
 type InteractionCreateDTO = {
 	cat: Cat;
@@ -29,6 +30,7 @@ type GiveChurrResult = {
 };
 
 class InteractionRepository {
+	formatter: typeof Formatter = Formatter;
 	cat: Cat;
 	channel: Channel;
 	user: User;
@@ -56,7 +58,7 @@ class InteractionRepository {
 			insufficient,
 		};
 		if (!this.cat.setHungryAvailable(-amount)) {
-			return { ...giveChurrResult, message: `${this.cat.getName()}은(는) 배가고프지 않아요` };
+			return { ...giveChurrResult, message: `${this.cat.getName()}은(는) 배가 고프지 않아요` };
 		}
 		if (!this.user.setCoinAvailable(-totalPrice)) {
 			return { ...giveChurrResult, message: `${Math.abs(insufficient)}만큼 코인이 부족해요!` };
