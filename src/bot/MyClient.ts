@@ -1,5 +1,7 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
+import cron from 'node-cron';
+import CatRepository from 'src/backend/repository/CatRepository';
 import { MessageBase } from 'src/backend/types';
 import InteractionRepository from 'src/bot/InteractionRepository';
 dotenv.config();
@@ -15,6 +17,36 @@ class MyClient extends Discord.Client {
 			MyClient.instance = this;
 		} else {
 			return MyClient.instance;
+		}
+	}
+	/**
+	 * 주기적 태스크를 실행함
+	 */
+	cronTask() {
+		const client = this;
+		cron.schedule('0 * * * * *', () => {
+			console.log('cat hungry tasks injected');
+			CatRepository.getAll().then((cats) => {
+				for (const cat of cats) {
+					console.log(cat.repository);
+					cat.increaseHungry();
+					cat.save();
+					console.log(`${cat.getName()}의 배고픔 + 1`);
+				}
+			});
+		});
+		cron.schedule('0 0 * * * *', () => {
+			CatRepository.getAll().then((cats) => {
+				for (const cat of cats) {
+					cat.repository.announceHungry(client, (interaction, cat) => {
+						interaction.send(`${cat.getName()}은 배고파요`);
+						interaction.send(`야옹`);
+					});
+				}
+			});
+		});
+		for (const task of cron.getTasks()) {
+			task[1].start();
 		}
 	}
 
