@@ -1,8 +1,8 @@
+import Discord, { Client } from 'discord.js';
 import Cat from 'src/backend/entity/Cat';
 import BaseRepository, { RepositoryDecorator } from 'src/backend/repository';
 import { BaseModelQueryParam, MessageBase } from 'src/backend/types';
 import { DEFAULTCATNAME } from 'src/const';
-import User from '../entity/User';
 
 @RepositoryDecorator<Cat>()
 class CatRepository extends BaseRepository<Cat> {
@@ -10,6 +10,26 @@ class CatRepository extends BaseRepository<Cat> {
 
 	constructor(model: Cat) {
 		super(model);
+	}
+	/**
+	 *
+	 * @param client
+	 * @param cb 디스코드의 급식소 채널에 수행할 콜백 코드입니다 ex: (interaction:Discord.TextBaseChannel,cat:Cat)=>{
+	 * 		interaction.send("고양이는 배고파요")
+	 * }
+	 */
+
+	announceHungry(client: Client, cb: (interaction: Discord.Channel, cat: Cat) => void) {
+		if (this.model.isHungry()) {
+			for (const channel of this.model.channels) {
+				if (channel.name == '급식소') {
+					const interaction = client.channels.cache.get(channel.id);
+					if (interaction.isTextBased()) {
+						cb(interaction, this.model);
+					}
+				}
+			}
+		}
 	}
 
 	public static getOrCreate(args: BaseModelQueryParam): Promise<Cat> {
