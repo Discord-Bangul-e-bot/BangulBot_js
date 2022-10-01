@@ -2,75 +2,121 @@ import Discord from 'discord.js';
 import User from 'src/backend/entity/User';
 import Message from 'src/backend/entity/Message';
 import client from 'src/bot/client';
-import InteractionRepository from 'src/bot/InteractionRepository';
+import InteractionRepository from 'src/bot/InteractionService';
+
+/**
+ *
+ * @param command
+ * @returns command+보기 , command+열기
+ */
+function openCommand(command: string) {
+	return (target: string) => {
+		return ['보기', '열기'].map((str) => target + str).includes(command);
+	};
+}
+
+function buyCommand(command: string) {
+	return (target: string) => {
+		return ['사기', '구매'].map((str) => target + str).includes(command);
+	};
+}
+
+function giveCommand(command: string) {
+	return (target: string) => {
+		return ['하기', '주기'].map((str) => target + str).includes(command);
+	};
+}
 
 const MessageInteraction = async (message: Discord.Message) => {
-	const repository = await InteractionRepository.builderFromMessage(message);
-	console.log(repository.relation.intimacy);
-	const command = client.getCommandFromMessage(message, repository);
-	const msgCommand = command.command;
+	const service = await InteractionRepository.builderFromMessage(message);
+	console.log(service.relation.getIntimacy());
+	const { command, ...msgCommand } = client.getCommandFromMessage(message, service);
+	const openCmd = openCommand(command);
+	const buyCmd = buyCommand(command);
+	const giveCmd = giveCommand(command);
 
-	console.table(command);
-	if (!command.acceptable) return;
+	if (!msgCommand.acceptable) return;
 
-	if (msgCommand === '야옹해봐') {
+	if (giveCmd('선물')) {
+		for (const itemName of msgCommand.arguments) {
+			const item = await service.marketService.findItem(itemName);
+			if (!item) return;
+		}
+		return;
+	}
+
+	if (openCmd('가방')) {
+		const items = await service.marketService.myItems();
+		const itemsString = items.join(',');
+		message.reply(itemsString);
+		return;
+	}
+	if (openCmd('상점')) {
+		const items = await service.marketService.openStore();
+		message.reply(items.map((item) => item).join(','));
+		return;
+	}
+	if (buyCmd('물건')) {
+		const item = await service.marketService.buyItem(msgCommand.arguments[0]);
+		if (item) {
+			message.reply('물건이 구맸다옹');
+		} else {
+			message.reply('당신은 돈이없다옹');
+		}
+		return;
+	}
+	if (command === '야옹해봐') {
 		const reply = '에옹?';
-		const formattedReply = new repository.formatter(reply).italic().toString();
+		const formattedReply = new service.formatter(reply).italic().toString();
 		message.channel.send(formattedReply);
 		return;
 	}
-	if (msgCommand === '상점열기') {
-		const items = await repository.openStore();
-		message.reply(items.map((item) => `${[item.name, item.price].join(':')}원`).join(','));
-		return;
-	}
 
-	if (msgCommand == '야옹해봐') {
+	if (command == '야옹해봐') {
 		message.channel.send('에옹?');
 		return;
 	}
-	if (msgCommand === '츄르주기') {
-		const result = await repository.giveChurr();
-		const formattedReply = new repository.formatter(result.message).bold().toString();
+	if (command === '츄르주기') {
+		const result = await service.giveChurr();
+		const formattedReply = new service.formatter(result.message).bold().toString();
 
 		message.reply(formattedReply);
 		return;
 	}
 
-	if (msgCommand === '손') {
-		const result = repository.askGiveHand();
-		const formattedReply = new repository.formatter(result.message).quote().toString();
+	if (command === '손') {
+		const result = service.askGiveHand();
+		const formattedReply = new service.formatter(result.message).quote().toString();
 
 		message.reply(formattedReply);
 		return;
 	}
 
-	if (msgCommand.startsWith('마크다운테스트')) {
-		const spiltedCommand = msgCommand.split(' ');
+	if (command === '마크다운테스트') {
 		const reply = '미애웅?';
 		let formattedReply = '';
 
-		switch (spiltedCommand[1]) {
+		switch (msgCommand.arguments[0]) {
 			case 'bold':
-				formattedReply = new repository.formatter(reply).bold().toString();
+				formattedReply = new service.formatter(reply).bold().toString();
 				break;
 			case 'italic':
-				formattedReply = new repository.formatter(reply).italic().toString();
+				formattedReply = new service.formatter(reply).italic().toString();
 				break;
 			case 'strikethrough':
-				formattedReply = new repository.formatter(reply).strikethrough().toString();
+				formattedReply = new service.formatter(reply).strikethrough().toString();
 				break;
 			case 'underscore':
-				formattedReply = new repository.formatter(reply).underscore().toString();
+				formattedReply = new service.formatter(reply).underscore().toString();
 				break;
 			case 'spoiler':
-				formattedReply = new repository.formatter(reply).spoiler().toString();
+				formattedReply = new service.formatter(reply).spoiler().toString();
 				break;
 			case 'quote':
-				formattedReply = new repository.formatter(reply).quote().toString();
+				formattedReply = new service.formatter(reply).quote().toString();
 				break;
 			case 'blockquote':
-				formattedReply = new repository.formatter(reply).blockQuote().toString();
+				formattedReply = new service.formatter(reply).blockQuote().toString();
 				break;
 			default:
 				formattedReply = '씨룬데?';

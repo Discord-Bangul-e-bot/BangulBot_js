@@ -3,8 +3,14 @@ import dotenv from 'dotenv';
 import cron from 'node-cron';
 import CatRepository from 'src/backend/repository/CatRepository';
 import { MessageBase } from 'src/backend/types';
-import InteractionRepository from 'src/bot/InteractionRepository';
+import InteractionRepository from 'src/bot/InteractionService';
 dotenv.config();
+
+type CommandFromMessage = {
+	acceptable: boolean;
+	command: string;
+	arguments: string[];
+};
 
 // NOTE: Client에서 사용 할 기능들을 래핑해줌
 class MyClient extends Discord.Client {
@@ -52,24 +58,27 @@ class MyClient extends Discord.Client {
 	}
 
 	isBotMessge(message: MessageBase, interaction: InteractionRepository) {
-		return message.author.id === interaction.cat.id;
+		return message.author.id === interaction.cat.model.id;
 	}
 
 	getCommandFromMessage(message: MessageBase, interactionRepository: InteractionRepository) {
 		const messageContent = message.content;
-		const result = {
+		const result: CommandFromMessage = {
 			acceptable: false,
 			command: '',
+			arguments: [],
 		};
 		if (this.isBotMessge(message, interactionRepository)) {
 			console.log('its bot message!');
 			return result;
 		}
-		if (!messageContent.startsWith(interactionRepository.cat.name)) return result;
+		if (!messageContent.startsWith(interactionRepository.cat.getName())) return result;
 		const message_split = messageContent.split(' ');
 		if (message_split.length == 1) return result;
-		const command = message_split.splice(1, message_split.length - 1).join(' ');
-		return { acceptable: true, command };
+		const command = message_split.splice(1, 2)[0];
+		const args = messageContent.split(' ').splice(2);
+
+		return { acceptable: true, command, arguments: args };
 	}
 }
 
