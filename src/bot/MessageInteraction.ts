@@ -34,13 +34,16 @@ const MessageInteraction = async (message: Discord.Message) => {
 	const openCmd = openCommand(command);
 	const buyCmd = buyCommand(command);
 	const giveCmd = giveCommand(command);
-
 	if (!msgCommand.acceptable) return;
 
 	if (giveCmd('선물')) {
 		for (const itemName of msgCommand.arguments) {
 			const item = await service.marketService.findItem(itemName);
 			if (!item) return;
+			const result = await service.marketService.useItem(item);
+			if (result) {
+				message.reply(`${service.cat.getName()}은 ${item}을 가지고 잘 놀았다.`);
+			}
 		}
 		return;
 	}

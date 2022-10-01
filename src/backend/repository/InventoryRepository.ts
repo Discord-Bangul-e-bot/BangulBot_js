@@ -14,6 +14,18 @@ class InventoryRepository extends BaseRepository<Inventory> {
 		super(model);
 	}
 
+	getFunny() {
+		return this.model.item.funny;
+	}
+
+	getHungry() {
+		return this.model.item.hungry;
+	}
+
+	getIntimacy() {
+		return this.model.item.intimacy;
+	}
+
 	static async findAll(user: User) {
 		const items = await Inventory.findBy({
 			user: {

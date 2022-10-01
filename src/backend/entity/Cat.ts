@@ -8,6 +8,7 @@ import { BeforeInsert, Column, Entity, JoinColumn, OneToMany } from 'typeorm';
 @Entity()
 class Cat extends BaseModel {
 	repository: CatRepository;
+
 	@OneToMany((type) => Relation, (relation) => relation.cat)
 	relations: Relation[];
 

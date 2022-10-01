@@ -49,8 +49,19 @@ class MarketService {
 	}
 
 	async useItem(itemRepo: InventoryRepository) {
+		const funny = itemRepo.getFunny();
+		const hungry = itemRepo.getHungry();
+		const intimacy = itemRepo.getIntimacy();
+		if (!this.cat.setHungryAvailable(hungry)) {
+			return false;
+		}
+
 		await itemRepo.useItem();
-		await new CatRepository(this.cat);
+		await this.cat.increaseFunny(itemRepo.getFunny());
+		await this.cat.increaseHungry(itemRepo.getHungry());
+		await this.relation.increaseIntimacy(itemRepo.getIntimacy());
+
+		return true;
 	}
 }
 
