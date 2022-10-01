@@ -24,6 +24,9 @@ class MyClient extends Discord.Client {
 	 */
 	cronTask() {
 		const client = this;
+		/**
+		 * 초 분 시 일 월 년
+		 */
 		cron.schedule('0 * * * * *', () => {
 			console.log('cat hungry tasks injected');
 			CatRepository.getAll().then((cats) => {
@@ -50,20 +53,20 @@ class MyClient extends Discord.Client {
 		}
 	}
 
-	isBotMessge(interaction: Discord.Message) {
-		console.log(this.user);
-		console.log(interaction.author);
-		return true;
+	isBotMessge(message: MessageBase, interaction: InteractionRepository) {
+		return message.author.id === interaction.cat.id;
 	}
 
-	getCommandFromMessage(message: MessageBase, InteractionRepository: InteractionRepository) {
+	getCommandFromMessage(message: MessageBase, interactionRepository: InteractionRepository) {
 		const messageContent = message.content;
 		const result = {
 			acceptable: false,
 			command: '',
 		};
-		// if (this.isBotMessge(interaction)) return result;
-		if (!messageContent.startsWith(InteractionRepository.cat.name)) return result;
+		if (this.isBotMessge(message, interactionRepository)) {
+			return result;
+		}
+		if (!messageContent.startsWith(interactionRepository.cat.name)) return result;
 		const message_split = messageContent.split(' ');
 		if (message_split.length == 1) return result;
 		const command = message_split.splice(1, message_split.length - 1).join(' ');
