@@ -8,11 +8,11 @@ import UserRepository from 'src/backend/repository/UserRepository';
 
 @Entity()
 class Relation extends BaseModel {
-	@ManyToOne((type) => Cat, (cat) => cat.relations, { onDelete: 'CASCADE', eager: true, nullable: false })
+	@ManyToOne((type) => Cat, (cat) => cat.relations, { onDelete: 'CASCADE', nullable: false })
 	@JoinColumn({ name: 'cat_id' })
 	cat: Cat;
 
-	@ManyToOne((type) => User, (user) => user.relations, { onDelete: 'CASCADE', eager: true, nullable: false })
+	@ManyToOne((type) => User, (user) => user.relations, { onDelete: 'CASCADE', nullable: false })
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 
