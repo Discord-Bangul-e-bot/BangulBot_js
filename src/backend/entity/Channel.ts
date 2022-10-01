@@ -9,7 +9,7 @@ class Channel extends BaseModel {
 	@Column({ default: true })
 	permission: boolean;
 
-	@ManyToOne((type) => Cat, (cat) => cat.channels, { onDelete: 'CASCADE' })
+	@ManyToOne((type) => Cat, (cat) => cat.channels, { onDelete: 'CASCADE', eager: false })
 	@JoinColumn({ name: 'cat_id' })
 	cat: Cat;
 
